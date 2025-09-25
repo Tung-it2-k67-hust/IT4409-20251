@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ex5 - Google-like Search</title>
+  <style>
+    body { font-family: Arial, sans-serif; height:100vh; display:flex; align-items:center; justify-content:center; margin:0; }
+    .search-box { text-align:center; }
+    .logo { font-size:64px; color:#4285F4; font-weight:bold; margin-bottom:20px; }
+    form { display:flex; justify-content:center; gap:8px; }
+    input[type="text"] { width:480px; padding:10px 14px; border:1px solid #dfe1e5; border-radius:24px; }
+    .buttons { margin-top:20px; }
+    button { padding:8px 16px; margin:0 6px; border:1px solid #dfe1e5; background:#f8f9fa; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <div class="search-box">
+    <div class="logo">Google</div>
+    <form onsubmit="return doSearch()">
+      <input type="text" id="q" placeholder="Search Google or type a URL" aria-label="Search">
+    </form>
+    <div class="buttons">
+      <button onclick="doSearch()">Google Search</button>
+      <button onclick="lucky()">I'm Feeling Lucky</button>
+    </div>
+    <p class="small">This is a demo page for learning HTML layout.</p>
+  </div>
+
+  <script>
+    function doSearch(){
+      const q = document.getElementById('q').value.trim();
+      if(!q){ alert('Please enter a search query.'); return false; }
+      alert('Searching for: ' + q + ' (demo)');
+      return false;
+    }
+    function lucky(){ alert("You're feeling lucky (demo)."); }
+  </script>
+</body>
+</html>
