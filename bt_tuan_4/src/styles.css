@@ -1,0 +1,85 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 30px;
+  color: #333;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.search-form input {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-form button {
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.search-form button:hover {
+  background-color: #0056b3;
+}
+
+.result-area {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.student-info {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.result-table th,
+.result-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.result-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.loading-indicator {
+  text-align: center;
+  color: gray;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+.error {
+  text-align: center;
+  color: #c53030;
+  margin-top: 20px;
+  font-weight: bold;
+}

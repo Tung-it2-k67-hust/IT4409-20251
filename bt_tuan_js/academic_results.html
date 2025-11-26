@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Học Tập</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>KẾT QUẢ HỌC TẬP</h1>
+        </div>
+
+        <div class="student-info">
+            <h2>Thông Tin Sinh Viên</h2>
+            <p><strong>Họ tên:</strong> Đỗ Sơn Tùng</p>
+            <p><strong>MSSV:</strong> 20225425</p>
+            <p><strong>Email:</strong> tung.ds225425@sis.hust.edu.vn</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-highlight" onclick="highlightGrades()">Highlight</button>
+            <button class="btn btn-gpa" onclick="calculateGPA()">GPA</button>
+            <button class="btn btn-filter" onclick="filterTopGrades()">Filter</button>
+            <button class="btn btn-sort" onclick="sortByGrade()">Sort</button>
+            <button class="btn btn-reset" onclick="resetTable()">Reset</button>
+        </div>
+
+        <div class="results-section">
+            <div class="semester">
+                <h3>Học Kỳ 2024.1 (20241)</h3>
+                <table id="table-20241">
+                    <thead>
+                        <tr>
+                            <th>Mã HP</th>
+                            <th>Tên Học Phần</th>
+                            <th>Tín Chỉ</th>
+                            <th>Điểm Số</th>
+                            <th>Điểm Chữ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>SSH1131</td>
+                            <td>Chủ nghĩa xã hội khoa học</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="D+" data-score="1.5">
+                            <td>PE2201</td>
+                            <td>Bóng đá 1</td>
+                            <td>0</td>
+                            <td>1.5</td>
+                            <td>D+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4593</td>
+                            <td>Nhập môn kỹ thuật truyền thông</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4172</td>
+                            <td>Xử lý tín hiệu</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3150</td>
+                            <td>Project I</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="B" data-score="3.0">
+                            <td>IT3090</td>
+                            <td>Cơ sở dữ liệu</td>
+                            <td>3</td>
+                            <td>3.0</td>
+                            <td>B</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3080</td>
+                            <td>Mạng máy tính</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT2030</td>
+                            <td>Technical Writing and Presentation</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="R" data-score="0">
+                            <td>FL1132</td>
+                            <td>Tiếng Anh cơ sở 2</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>R</td>
+                        </tr>
+                        <tr data-grade="R" data-score="0">
+                            <td>FL1131</td>
+                            <td>Tiếng Anh cơ sở 1</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>R</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>ED3280</td>
+                            <td>Tâm lý học ứng dụng</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="semester">
+                <h3>Học Kỳ 2024.2 (20242)</h3>
+                <table id="table-20242">
+                    <thead>
+                        <tr>
+                            <th>Mã HP</th>
+                            <th>Tên Học Phần</th>
+                            <th>Tín Chỉ</th>
+                            <th>Điểm Số</th>
+                            <th>Điểm Chữ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4611</td>
+                            <td>Các hệ thống phân tán và ứng dụng</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="B" data-score="3.0">
+                            <td>IT4060</td>
+                            <td>Lập trình mạng</td>
+                            <td>2</td>
+                            <td>3.0</td>
+                            <td>B</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4015</td>
+                            <td>Nhập môn an toàn thông tin</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3931</td>
+                            <td>Project II</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="C+" data-score="2.5">
+                            <td>IT3180</td>
+                            <td>Nhập môn công nghệ phần mềm</td>
+                            <td>3</td>
+                            <td>2.5</td>
+                            <td>C+</td>
+                        </tr>
+                        <tr data-grade="D" data-score="1.0">
+                            <td>IT3170</td>
+                            <td>Thuật toán ứng dụng</td>
+                            <td>2</td>
+                            <td>1.0</td>
+                            <td>D</td>
+                        </tr>
+                        <tr data-grade="B+" data-score="3.3">
+                            <td>IT3120</td>
+                            <td>Phân tích và thiết kế hệ thống</td>
+                            <td>2</td>
+                            <td>3.3</td>
+                            <td>B+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT3070</td>
+                            <td>Nguyên lý hệ điều hành</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="gpa-result"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So sánh Fetch vs Axios + Async/Await</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .comparison { display: flex; gap: 20px; margin: 20px 0; }
+        .method { flex: 1; padding: 20px; border: 2px solid #ddd; border-radius: 8px; }
+        .old-method { border-color: #ff6b6b; background: #ffeaea; }
+        .new-method { border-color: #4ecdc4; background: #e8f8f7; }
+        .code-block { background: #f4f4f4; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; margin: 10px 0; }
+        .highlight { background: #fff3cd; padding: 2px 4px; border-radius: 2px; }
+        .benefit { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .problem { background: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        h2 { color: #333; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        h3 { color: #555; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 So sánh Fetch/.then vs Axios + Async/Await</h1>
+
+    <div class="comparison">
+        <div class="method old-method">
+            <h2>❌ Code cũ: Fetch + .then()</h2>
+
+            <h3>1. GET request:</h3>
+            <div class="code-block">
+fetch("https://jsonplaceholder.typicode.com/users")<br>
+  .then(res => res.json())<br>
+  .then(data => { setUsers(data); setLoading(false); });
+            </div>
+
+            <h3>2. POST request:</h3>
+            <div class="code-block">
+fetch('https://jsonplaceholder.typicode.com/users', {<br>
+  method: 'POST',<br>
+  headers: { 'Content-Type': 'application/json' },<br>
+  body: JSON.stringify(user)<br>
+})<br>
+.then(res => res.json())<br>
+.then(data => { /* handle response */ });
+            </div>
+
+            <div class="problem">
+                <strong>❌ Vấn đề:</strong>
+                <ul>
+                    <li>Callback hell khi nhiều request</li>
+                    <li>Phải tự parse JSON thủ công</li>
+                    <li>Error handling phức tạp</li>
+                    <li>Code khó đọc, khó maintain</li>
+                    <li>Không có timeout mặc định</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="method new-method">
+            <h2>✅ Code mới: Axios + Async/Await</h2>
+
+            <h3>1. GET request:</h3>
+            <div class="code-block">
+try {<br>
+  <span class="highlight">const response = await axios.get('https://jsonplaceholder.typicode.com/users');</span><br>
+  setUsers(response.data);<br>
+  setLoading(false);<br>
+} catch (error) {<br>
+  alert(`Lỗi: ${error.message}`);<br>
+}
+            </div>
+
+            <h3>2. POST request:</h3>
+            <div class="code-block">
+try {<br>
+  <span class="highlight">const response = await axios.post('https://jsonplaceholder.typicode.com/users', user);</span><br>
+  const newUser = response.data;<br>
+  // Update UI manually<br>
+} catch (error) {<br>
+  alert(`Lỗi: ${error.message}`);<br>
+}
+            </div>
+
+            <div class="benefit">
+                <strong>✅ Lợi ích:</strong>
+                <ul>
+                    <li>Code đồng bộ, dễ đọc như code thông thường</li>
+                    <li>Tự động parse JSON (response.data)</li>
+                    <li>Error handling đơn giản với try/catch</li>
+                    <li>Không callback hell</li>
+                    <li>Hỗ trợ timeout, interceptors, etc.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h2>🎯 Ý nghĩa bài tập của thầy:</h2>
+
+    <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>1. Học Async/Await (ES7+)</h3>
+        <p>Thay vì dùng Promise/.then() (callback-based), học cách viết code bất đồng bộ như code đồng bộ</p>
+
+        <h3>2. Học Axios thay vì Fetch</h3>
+        <p>Axios là HTTP client phổ biến hơn fetch, có nhiều tính năng built-in</p>
+
+        <h3>3. Error Handling tốt hơn</h3>
+        <p>Dùng try/catch thay vì .catch() - dễ đọc và maintain hơn</p>
+
+        <h3>4. Manual UI Updates</h3>
+        <p>Hiểu cách React state hoạt động - không dựa vào API response để update UI</p>
+
+        <h3>5. Modern JavaScript Practices</h3>
+        <p>Chuẩn bị cho việc làm thực tế với các best practices hiện đại</p>
+    </div>
+
+    <h2>📊 So sánh chi tiết:</h2>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+            <tr style="background: #f8f9fa;">
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Tính năng</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Fetch + .then</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Axios + Async/Await</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Đọc code</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Khó (callback chain)</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Dễ (như code đồng bộ)</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Parse JSON</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Thủ công (.json())</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Tự động (response.data)</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Error handling</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">.catch() phức tạp</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">try/catch đơn giản</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Timeout</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Không có mặc định</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Có thể set timeout</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Request/Response interceptors</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Không có</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Có sẵn</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Browser support</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Modern browsers</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">Cần polyfill cho IE</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>🚀 Tại sao Async/Await + Axios tốt hơn?</h2>
+
+    <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <p><strong>1. Code dễ đọc hơn:</strong> Không còn callback pyramid, code chạy từ trên xuống dưới như code thông thường</p>
+
+        <p><strong>2. Error handling tốt hơn:</strong> try/catch bao quanh toàn bộ logic, không cần .catch() riêng lẻ</p>
+
+        <p><strong>3. Debug dễ hơn:</strong> Có thể đặt breakpoint trong async function như code đồng bộ</p>
+
+        <p><strong>4. Maintainability:</strong> Code dễ sửa đổi, thêm logic mới mà không làm rối callback chain</p>
+
+        <p><strong>5. Modern JavaScript:</strong> Đây là standard hiện đại, được dùng trong hầu hết các dự án React/Vue/Angular</p>
+    </div>
+
+    <h2>💡 Bài học từ bài tập:</h2>
+    <ul>
+        <li><strong>Học cách migrate từ callback sang async/await</strong> - kỹ năng quan trọng trong công việc</li>
+        <li><strong>Hiểu sự khác biệt giữa fetch và axios</strong> - biết chọn tool phù hợp</li>
+        <li><strong>Thực hành error handling</strong> - ứng dụng thực tế luôn cần handle lỗi</li>
+        <li><strong>Manual state management</strong> - hiểu cách React state hoạt động</li>
+        <li><strong>Modern JavaScript patterns</strong> - chuẩn bị cho môi trường làm việc thực tế</li>
+    </ul>
+
+</body>
+</html>

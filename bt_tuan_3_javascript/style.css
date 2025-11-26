@@ -1,0 +1,15 @@
+body{margin:0;background:var(--bg);color:#0b1220}
+.container{max-width:900px;margin:28px auto;padding:16px}
+.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(9,30,66,.08);margin-bottom:16px}
+h1{margin:0 0 12px;font-size:22px}
+label{display:block;margin-bottom:6px}
+input{padding:10px;border-radius:8px;border:1px solid #d7dde6;width:60%;margin-right:8px}
+button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:rgb(176, 148, 148);cursor:pointer}
+button#btnClear{background:#718096;margin-left:8px}
+.status{margin-top:10px}
+.status.error{color:#c53030}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #eef2f7;text-align:left}
+th{background:#b8bdc0}
+footer{font-size:13px;color:#475569}

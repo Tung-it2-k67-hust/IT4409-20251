@@ -1,0 +1,19 @@
+[
+  { "cid": "IT4991", "name": "Thực tập kỹ thuật", "credits": 2 },
+  { "cid": "IT3120", "name": "Phân tích và thiết kế hệ thống", "credits": 2 },
+  { "cid": "IT4060", "name": "Lập trình mạng", "credits": 2 },
+  { "cid": "IT4015", "name": "Nhập môn An toàn thông tin", "credits": 3 },
+  { "cid": "IT3180", "name": "Nhập môn Công nghệ phần mềm", "credits": 3 },
+  { "cid": "IT3931", "name": "Project II", "credits": 2 },
+  { "cid": "IT3070", "name": "Nguyên lý Hệ điều hành", "credits": 3 },
+  { "cid": "IT4611", "name": "Các hệ thống phân tán và ứng dụng", "credits": 2 },
+  { "cid": "IT3170", "name": "Thuật toán ứng dụng", "credits": 2 },
+  { "cid": "ED3280", "name": "Tâm lý học ứng dụng", "credits": 2 },
+  { "cid": "IT3080", "name": "Mạng máy tính", "credits": 3 },
+  { "cid": "IT3090", "name": "Cơ sở dữ liệu", "credits": 3 },
+  { "cid": "IT3150", "name": "Project I", "credits": 2 },
+  { "cid": "IT4593", "name": "Nhập môn Kỹ thuật truyền thông", "credits": 2 },
+  { "cid": "IT2030", "name": "Technical Writing and Presentation", "credits": 3 },
+  { "cid": "IT4172", "name": "Xử lý tín hiệu", "credits": 2 },
+  { "cid": "SSH1131", "name": "Chủ nghĩa xã hội khoa học", "credits": 2 }
+]

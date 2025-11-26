@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD App - Server Response Demo</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+    /* Response Panel */
+    .response-panel {
+      position: fixed; top: 20px; right: 20px; width: 400px; max-height: 80vh;
+      background: white; border: 2px solid #ddd; border-radius: 8px; padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow-y: auto; z-index: 1000;
+    }
+    .response-panel h3 { margin-top: 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    .response-item { margin: 15px 0; padding: 15px; border-radius: 6px; border-left: 4px solid; }
+    .response-success { background: #d4edda; border-color: #28a745; }
+    .response-error { background: #f8d7da; border-color: #dc3545; }
+    .response-info { background: #d1ecf1; border-color: #17a2b8; }
+    .response-loading { background: #fff3cd; border-color: #ffc107; }
+
+    .response-code { font-family: monospace; font-weight: bold; margin-bottom: 5px; }
+    .response-data { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 150px; overflow-y: auto; }
+    .response-time { font-size: 11px; color: #666; margin-top: 5px; }
+
+    /* Buttons */
+    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .btn-primary { background: #4CAF50; color: white; }
+    .btn-primary:hover { background: #45a049; }
+    .btn-secondary { background: #2196F3; color: white; }
+    .btn-secondary:hover { background: #0b7dda; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-danger:hover { background: #da190b; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #218838; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center;
+      align-items: center; z-index: 999; animation: fadeIn 0.2s;
+    }
+    .modal-content {
+      background: #fff; padding: 30px; border-radius: 8px; width: 600px;
+      max-height: 90vh; overflow-y: auto; animation: slideIn 0.3s;
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+    .form-group input { width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; }
+    th { background-color: #4CAF50; color: white; font-weight: 600; }
+    tbody tr:hover { background-color: #f5f5f5; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px; font-size: 18px; color: #666; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #4CAF50; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+
+    /* Action buttons */
+    .action-buttons { display: flex; gap: 5px; }
+
+    /* Demo controls */
+    .demo-controls { background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .demo-controls h3 { margin-top: 0; color: #495057; }
+    .demo-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const API_URL = 'https://jsonplaceholder.typicode.com/users';
+
+    // Response Panel Component
+    function ResponsePanel({ responses }) {
+      return (
+        <div className="response-panel">
+          <h3>📡 Server Responses</h3>
+          {responses.length === 0 ? (
+            <p style={{color: '#666', fontStyle: 'italic'}}>Chưa có response nào...</p>
+          ) : (
+            responses.slice(0, 5).map((response, index) => (
+              <div key={index} className={`response-item response-${response.type}`}>
+                <div className="response-code">
+                  {response.method} {response.status} - {response.message}
+                </div>
+                {response.data && (
+                  <div className="response-data">
+                    {JSON.stringify(response.data, null, 2)}
+                  </div>
+                )}
+                <div className="response-time">
+                  {new Date(response.timestamp).toLocaleTimeString()}
+                </div>
+              </div>
+            ))
+          )}
+          {responses.length > 5 && (
+            <p style={{textAlign: 'center', color: '#666', margin: '10px 0'}}>
+              ... và {responses.length - 5} response khác
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    // SearchForm Component
+    function SearchForm({ onChangeValue }) {
+      return (
+        <div>
+          <h3>🔍 Tìm kiếm người dùng</h3>
+          <input
+            type="text"
+            placeholder="Tìm theo Name hoặc Username..."
+            onChange={(e) => onChangeValue(e.target.value)}
+          />
+        </div>
+      );
+    }
+
+    // AddUser Component
+    function AddUser({ onAdd, onResponse }) {
+      const [isOpen, setIsOpen] = React.useState(false);
+      const [loading, setLoading] = React.useState(false);
+      const [user, setUser] = React.useState({
+        name: "", username: "", email: "",
+        address: { street: "", suite: "", city: "" },
+        phone: "", website: ""
+      });
+
+      const handleChange = (e) => {
+        const { id, value } = e.target;
+        if (["street", "suite", "city"].includes(id)) {
+          setUser({ ...user, address: { ...user.address, [id]: value } });
+        } else {
+          setUser({ ...user, [id]: value });
+        }
+      };
+
+      const handleAdd = async () => {
+        if (!user.name || !user.username) {
+          onResponse({
+            type: 'error',
+            method: 'VALIDATION',
+            status: 400,
+            message: 'Thiếu thông tin bắt buộc',
+            data: { errors: ['Name và Username là bắt buộc'] },
+            timestamp: Date.now()
+          });
+          return;
+        }
+
+        setLoading(true);
+        const startTime = Date.now();
+
+        try {
+          // POST request với axios
+          const response = await axios.post(API_URL, user);
+
+          const endTime = Date.now();
+          const newUser = response.data;
+          newUser.id = Date.now(); // Simulate ID for demo
+
+          onResponse({
+            type: 'success',
+            method: 'POST',
+            status: response.status,
+            message: 'Tạo user thành công',
+            data: {
+              id: newUser.id,
+              name: newUser.name,
+              username: newUser.username,
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+
+          onAdd(newUser);
+          setUser({ name: "", username: "", email: "", address: { street: "", suite: "", city: "" }, phone: "", website: "" });
+          setIsOpen(false);
+        } catch (error) {
+          const endTime = Date.now();
+          onResponse({
+            type: 'error',
+            method: 'POST',
+            status: error.response?.status || 500,
+            message: 'Tạo user thất bại',
+            data: {
+              error: error.message,
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div>
+          <button className="btn-primary" onClick={() => setIsOpen(true)}>
+            ➕ Thêm người dùng mới
+          </button>
+          {isOpen && (
+            <div className="modal-overlay" onClick={() => setIsOpen(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h3>📝 Thêm người dùng mới</h3>
+                <div className="form-group">
+                  <label>Name: *</label>
+                  <input id="name" value={user.name} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Username: *</label>
+                  <input id="username" value={user.username} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Email:</label>
+                  <input id="email" type="email" value={user.email} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Street:</label>
+                  <input id="street" value={user.address.street} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Suite:</label>
+                  <input id="suite" value={user.address.suite} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>City:</label>
+                  <input id="city" value={user.address.city} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Phone:</label>
+                  <input id="phone" value={user.phone} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Website:</label>
+                  <input id="website" value={user.website} onChange={handleChange} />
+                </div>
+                <div>
+                  <button className="btn-primary" onClick={handleAdd} disabled={loading}>
+                    {loading ? '⏳ Đang tạo...' : '✅ Tạo'}
+                  </button>
+                  <button className="btn-secondary" onClick={() => setIsOpen(false)} disabled={loading}>
+                    ❌ Hủy
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // EditUser Component
+    function EditUser({ editing, onSave, onCancel, onResponse }) {
+      const [user, setUser] = React.useState(editing);
+      const [loading, setLoading] = React.useState(false);
+
+      const handleChange = (e) => {
+        const { id, value } = e.target;
+        if (["street", "suite", "city"].includes(id)) {
+          setUser({ ...user, address: { ...user.address, [id]: value } });
+        } else {
+          setUser({ ...user, [id]: value });
+        }
+      };
+
+      const handleSave = async () => {
+        if (!user.name || !user.username) {
+          onResponse({
+            type: 'error',
+            method: 'VALIDATION',
+            status: 400,
+            message: 'Thiếu thông tin bắt buộc',
+            data: { errors: ['Name và Username là bắt buộc'] },
+            timestamp: Date.now()
+          });
+          return;
+        }
+
+        setLoading(true);
+        const startTime = Date.now();
+
+        try {
+          // PUT request với axios
+          const response = await axios.put(`${API_URL}/${user.id}`, user);
+
+          const endTime = Date.now();
+          onResponse({
+            type: 'success',
+            method: 'PUT',
+            status: response.status,
+            message: 'Cập nhật user thành công',
+            data: {
+              id: user.id,
+              name: user.name,
+              username: user.username,
+              changes: 'Updated user information',
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+
+          onSave(user);
+        } catch (error) {
+          const endTime = Date.now();
+          onResponse({
+            type: 'error',
+            method: 'PUT',
+            status: error.response?.status || 500,
+            message: 'Cập nhật user thất bại',
+            data: {
+              error: error.message,
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="modal-overlay" onClick={onCancel}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>✏️ Sửa thông tin người dùng</h3>
+            <div className="form-group">
+              <label>Name: *</label>
+              <input id="name" value={user.name} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Username: *</label>
+              <input id="username" value={user.username} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Email:</label>
+              <input id="email" type="email" value={user.email} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Street:</label>
+              <input id="street" value={user.address.street} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Suite:</label>
+              <input id="suite" value={user.address.suite} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>City:</label>
+              <input id="city" value={user.address.city} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Phone:</label>
+              <input id="phone" value={user.phone} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Website:</label>
+              <input id="website" value={user.website} onChange={handleChange} />
+            </div>
+            <div>
+              <button className="btn-primary" onClick={handleSave} disabled={loading}>
+                {loading ? '⏳ Đang lưu...' : '💾 Lưu'}
+              </button>
+              <button className="btn-secondary" onClick={onCancel} disabled={loading}>
+                ❌ Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ResultTable Component
+    function ResultTable({
+      keyword, users, loading, editing, setEditing,
+      onSaveEdit, onDelete, onResponse
+    }) {
+      const [deleting, setDeleting] = React.useState(null);
+
+      const filteredUsers = users.filter(u =>
+        u.name.toLowerCase().includes(keyword.toLowerCase()) ||
+        u.username.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      const handleEdit = (u) => {
+        setEditing({ ...u, address: { ...u.address } });
+      };
+
+      const handleDelete = async (id) => {
+        if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+          return;
+        }
+
+        setDeleting(id);
+        const startTime = Date.now();
+
+        try {
+          // DELETE request với axios
+          const response = await axios.delete(`${API_URL}/${id}`);
+
+          const endTime = Date.now();
+          onResponse({
+            type: 'success',
+            method: 'DELETE',
+            status: response.status,
+            message: 'Xóa user thành công',
+            data: {
+              id: id,
+              deleted: true,
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+
+          onDelete(id);
+        } catch (error) {
+          const endTime = Date.now();
+          onResponse({
+            type: 'error',
+            method: 'DELETE',
+            status: error.response?.status || 500,
+            message: 'Xóa user thất bại',
+            data: {
+              error: error.message,
+              responseTime: `${endTime - startTime}ms`
+            },
+            timestamp: endTime
+          });
+        } finally {
+          setDeleting(null);
+        }
+      };
+
+      if (loading) {
+        return (
+          <div className="loading">
+            <div className="spinner"></div>
+            <div>⏳ Đang tải dữ liệu từ server...</div>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <h3>📋 Danh sách người dùng ({filteredUsers.length})</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>City</th>
+                <th>Phone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{textAlign: 'center', padding: '20px'}}>
+                    Không tìm thấy người dùng nào
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map(u => (
+                  <tr key={u.id}>
+                    <td>{u.id}</td>
+                    <td>{u.name}</td>
+                    <td>{u.username}</td>
+                    <td>{u.email}</td>
+                    <td>{u.address?.city || ''}</td>
+                    <td>{u.phone}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="btn-secondary"
+                          onClick={() => handleEdit(u)}
+                          disabled={deleting === u.id}
+                        >
+                          ✏️ Sửa
+                        </button>
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleDelete(u.id)}
+                          disabled={deleting === u.id}
+                        >
+                          {deleting === u.id ? '⏳ Đang xóa...' : '🗑️ Xóa'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+          {editing && (
+            <EditUser
+              editing={editing}
+              onSave={onSaveEdit}
+              onCancel={() => setEditing(null)}
+              onResponse={onResponse}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // Demo Controls Component
+    function DemoControls({ onResponse }) {
+      const simulateResponses = () => {
+        const responses = [
+          {
+            type: 'success',
+            method: 'POST',
+            status: 201,
+            message: 'User created successfully',
+            data: { id: 101, name: 'Demo User', responseTime: '245ms' },
+            timestamp: Date.now() - 3000
+          },
+          {
+            type: 'success',
+            method: 'PUT',
+            status: 200,
+            message: 'User updated successfully',
+            data: { id: 1, name: 'Updated User', responseTime: '189ms' },
+            timestamp: Date.now() - 2000
+          },
+          {
+            type: 'success',
+            method: 'DELETE',
+            status: 200,
+            message: 'User deleted successfully',
+            data: { id: 5, deleted: true, responseTime: '156ms' },
+            timestamp: Date.now() - 1000
+          },
+          {
+            type: 'error',
+            method: 'POST',
+            status: 400,
+            message: 'Validation failed',
+            data: { error: 'Email already exists', responseTime: '234ms' },
+            timestamp: Date.now()
+          }
+        ];
+
+        responses.forEach((response, index) => {
+          setTimeout(() => onResponse(response), index * 500);
+        });
+      };
+
+      return (
+        <div className="demo-controls">
+          <h3>🎮 Demo Controls - Thử nghiệm phản hồi server</h3>
+          <div className="demo-buttons">
+            <button className="btn-success" onClick={simulateResponses}>
+              🎭 Hiển thị Demo Responses
+            </button>
+            <button className="btn-primary" onClick={() => onResponse({
+              type: 'info',
+              method: 'INFO',
+              status: 200,
+              message: 'Demo: Thao tác CRUD sẽ hiển thị response ở panel bên phải',
+              data: { note: 'Thử click các nút Thêm/Sửa/Xóa để xem response thật' },
+              timestamp: Date.now()
+            })}>
+              ℹ️ Hướng dẫn
+            </button>
+          </div>
+          <p style={{margin: '10px 0', fontSize: '14px', color: '#666'}}>
+            💡 <strong>Mẹo:</strong> Mở Developer Tools (F12) → Network tab để xem HTTP requests thật
+          </p>
+        </div>
+      );
+    }
+
+    // Main App Component
+    function App() {
+      const [kw, setKeyword] = React.useState("");
+      const [users, setUsers] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [editing, setEditing] = React.useState(null);
+      const [responses, setResponses] = React.useState([]);
+
+      // Fetch users khi component mount
+      React.useEffect(() => {
+        const fetchUsers = async () => {
+          const startTime = Date.now();
+          try {
+            const response = await axios.get(API_URL);
+            const endTime = Date.now();
+
+            setResponses(prev => [...prev, {
+              type: 'success',
+              method: 'GET',
+              status: response.status,
+              message: 'Tải danh sách users thành công',
+              data: {
+                count: response.data.length,
+                responseTime: `${endTime - startTime}ms`
+              },
+              timestamp: endTime
+            }]);
+
+            setUsers(response.data);
+            setLoading(false);
+          } catch (error) {
+            const endTime = Date.now();
+            setResponses(prev => [...prev, {
+              type: 'error',
+              method: 'GET',
+              status: error.response?.status || 500,
+              message: 'Tải danh sách users thất bại',
+              data: {
+                error: error.message,
+                responseTime: `${endTime - startTime}ms`
+              },
+              timestamp: endTime
+            }]);
+            setLoading(false);
+          }
+        };
+        fetchUsers();
+      }, []);
+
+      const handleAddUser = (user) => {
+        // Update UI manually sau khi POST thành công
+        setUsers(prev => [...prev, user]);
+      };
+
+      const handleSaveEdit = (updatedUser) => {
+        // Update UI manually sau khi PUT thành công
+        setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+        setEditing(null);
+      };
+
+      const handleDeleteUser = (id) => {
+        // Update UI manually sau khi DELETE thành công
+        setUsers(prev => prev.filter(u => u.id !== id));
+      };
+
+      const handleResponse = (response) => {
+        setResponses(prev => [response, ...prev.slice(0, 9)]); // Keep only last 10 responses
+      };
+
+      return (
+        <div className="container">
+          <h1>🚀 CRUD App - Server Response Demo</h1>
+
+          <DemoControls onResponse={handleResponse} />
+
+          <SearchForm onChangeValue={setKeyword} />
+
+          <AddUser
+            onAdd={handleAddUser}
+            onResponse={handleResponse}
+          />
+
+          <ResultTable
+            keyword={kw}
+            users={users}
+            loading={loading}
+            editing={editing}
+            setEditing={setEditing}
+            onSaveEdit={handleSaveEdit}
+            onDelete={handleDeleteUser}
+            onResponse={handleResponse}
+          />
+
+          <ResponsePanel responses={responses} />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

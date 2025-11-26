@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tra cứu kết quả học tập</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
+
+    #searchBox {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    input, button {
+      padding: 8px 12px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    #loading {
+      text-align: center;
+      color: gray;
+      font-style: italic;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tra cứu kết quả học tập</h1>
+
+  <div id="searchBox">
+    <input type="text" id="studentId" placeholder="Nhập mã sinh viên...">
+    <button id="btnSearch">Tra cứu</button>
+  </div>
+
+  <div id="result"></div>
+  <p id="loading"></p>
+
+  <script>
+    // ====== Cấu hình các file dữ liệu JSON ======
+    const DATA_FILES = {
+      sinhvien: 'sinhvien.json',
+      hocphan: 'hocphan.json',
+      ketqua: 'ketqua.json'
+    };
+
+    // ====== Hàm mô phỏng fetch dữ liệu có độ trễ ======
+    function fetchWithDelay(url, delay = 500) {
+      return new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Không thể tải " + url);
+            const data = await res.json();
+            resolve(data);
+          } catch (err) {
+            reject(err);
+          }
+        }, delay);
+      });
+    }
+
+    // ====== Chuyển điểm số sang điểm chữ ======
+    function convertScore(score) {
+      if (score >= 9.5) return "A+";
+      if (score >= 8.5) return "A";
+      if (score >= 8) return "B+";
+      if (score >= 7) return "B";
+      if (score >= 6.5) return "C+";
+      if (score >= 5.5) return "C";
+      if (score >= 5) return "D+";
+      if (score >= 4) return "D";
+      return "F";
+    }
+
+    // ====== Hàm chính xử lý tra cứu ======
+    async function traCuu() {
+      const sid = document.getElementById('studentId').value.trim();
+      localStorage.removeItem(sid);
+      const resultDiv = document.getElementById('result');
+      const loading = document.getElementById('loading');
+      resultDiv.innerHTML = '';
+      loading.textContent = 'Đang tải dữ liệu...';
+
+      // Kiểm tra cache trước
+      const cached = localStorage.getItem(sid);
+      if (cached) {
+        loading.textContent = '(Đã lấy từ cache)';
+        const data = JSON.parse(cached);
+        renderResult(data);
+        return;
+      }
+
+      try {
+        // Tải dữ liệu bất đồng bộ
+        const [sinhvienList, hocphanList, ketquaList] = await Promise.all([
+          fetchWithDelay(DATA_FILES.sinhvien, 400),
+          fetchWithDelay(DATA_FILES.hocphan, 400),
+          fetchWithDelay(DATA_FILES.ketqua, 700)
+        ]);
+
+        // Tìm sinh viên theo sid
+        const sv = sinhvienList.find(s => s.sid === sid);
+        if (!sv) {
+          loading.textContent = '';
+          resultDiv.innerHTML = `<p style="color:red;">❌ Không tìm thấy mã sinh viên!</p>`;
+          return;
+        }
+
+        // Lọc kết quả theo sinh viên
+        const kq = ketquaList.filter(k => k.sid === sid);
+        const merged = kq.map(item => {
+          const hp = hocphanList.find(h => h.cid === item.cid);
+          const score = item.score;
+          return {
+            cid: item.cid,
+            name: hp ? hp.name : 'Không rõ',
+            credits: hp ? hp.credits : '?',
+            term: item.term,
+            score: score,
+            letter: convertScore(score)
+          };
+        });
+
+        // Lưu cache
+        const dataToCache = { sv, merged };
+        localStorage.setItem(sid, JSON.stringify(dataToCache));
+
+        // Hiển thị kết quả
+        renderResult(dataToCache);
+        loading.textContent = '';
+
+      } catch (error) {
+        loading.textContent = '';
+        resultDiv.innerHTML = `<p style="color:red;">⚠️ Lỗi khi tải dữ liệu: ${error.message}</p>`;
+        console.error(error);
+      }
+    }
+
+    // ====== Hiển thị kết quả ra HTML ======
+    function renderResult({ sv, merged }) {
+      let html = `
+        <h3>Thông tin sinh viên</h3>
+        <p><b>MSSV:</b> ${sv.sid} | <b>Họ tên:</b> ${sv.name} | <b>Ngày sinh:</b> ${sv.dob}</p>
+        <table>
+          <tr>
+            <th>Mã học phần</th>
+            <th>Tên học phần</th>
+            <th>Số tín chỉ</th>
+            <th>Học kỳ</th>
+            <th>Điểm số (10)</th>
+            <th>Điểm chữ</th>
+          </tr>
+      `;
+
+      merged.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.cid}</td>
+            <td>${r.name}</td>
+            <td>${r.credits}</td>
+            <td>${r.term}</td>
+            <td>${r.score}</td>
+            <td>${r.letter}</td>
+          </tr>`;
+      });
+
+      html += '</table>';
+      document.getElementById('result').innerHTML = html;
+    }
+
+    // ====== Gắn sự kiện click ======
+    document.getElementById('btnSearch').addEventListener('click', traCuu);
+  </script>
+
+</body>
+</html>

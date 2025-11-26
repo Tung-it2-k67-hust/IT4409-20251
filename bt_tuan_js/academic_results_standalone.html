@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Học Tập</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .student-info {
+            background: #f9f9f9;
+            padding: 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        .student-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .student-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .student-info strong {
+            color: #555;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #333;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        .btn-highlight {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .btn-gpa {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .btn-filter {
+            background: #FF9800;
+            color: white;
+            border-color: #FF9800;
+        }
+
+        .btn-sort {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .btn-reset {
+            background: #607D8B;
+            color: white;
+            border-color: #607D8B;
+        }
+
+        .results-section {
+            padding: 20px;
+        }
+
+        .semester {
+            margin-bottom: 30px;
+        }
+
+        .semester h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        thead {
+            background: #333;
+            color: white;
+        }
+
+        th {
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .highlight-a {
+            background-color: lightgreen !important;
+        }
+
+        .highlight-f {
+            background-color: black !important;
+            color: white !important;
+        }
+
+        .gpa-display {
+            background: #e3f2fd;
+            padding: 15px;
+            border: 1px solid #2196F3;
+            margin-top: 20px;
+        }
+
+        .gpa-display h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .gpa-item {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .gpa-item strong {
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>KẾT QUẢ HỌC TẬP</h1>
+        </div>
+
+        <div class="student-info">
+            <h2>Thông Tin Sinh Viên</h2>
+            <p><strong>Họ tên:</strong> Đỗ Sơn Tùng</p>
+            <p><strong>MSSV:</strong> 20225425</p>
+            <p><strong>Email:</strong> tung.ds225425@sis.hust.edu.vn</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-highlight" onclick="highlightGrades()">Highlight</button>
+            <button class="btn btn-gpa" onclick="calculateGPA()">GPA</button>
+            <button class="btn btn-filter" onclick="filterTopGrades()">Filter</button>
+            <button class="btn btn-sort" onclick="sortByGrade()">Sort</button>
+            <button class="btn btn-reset" onclick="resetTable()">Reset</button>
+        </div>
+
+        <div class="results-section">
+            <div class="semester">
+                <h3>Học Kỳ 2024.1 (20241)</h3>
+                <table id="table-20241">
+                    <thead>
+                        <tr>
+                            <th>Mã HP</th>
+                            <th>Tên Học Phần</th>
+                            <th>Tín Chỉ</th>
+                            <th>Điểm Số</th>
+                            <th>Điểm Chữ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>SSH1131</td>
+                            <td>Chủ nghĩa xã hội khoa học</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="D+" data-score="1.5">
+                            <td>PE2201</td>
+                            <td>Bóng đá 1</td>
+                            <td>0</td>
+                            <td>1.5</td>
+                            <td>D+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4593</td>
+                            <td>Nhập môn kỹ thuật truyền thông</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4172</td>
+                            <td>Xử lý tín hiệu</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3150</td>
+                            <td>Project I</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="B" data-score="3.0">
+                            <td>IT3090</td>
+                            <td>Cơ sở dữ liệu</td>
+                            <td>3</td>
+                            <td>3.0</td>
+                            <td>B</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3080</td>
+                            <td>Mạng máy tính</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT2030</td>
+                            <td>Technical Writing and Presentation</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="R" data-score="0">
+                            <td>FL1132</td>
+                            <td>Tiếng Anh cơ sở 2</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>R</td>
+                        </tr>
+                        <tr data-grade="R" data-score="0">
+                            <td>FL1131</td>
+                            <td>Tiếng Anh cơ sở 1</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>R</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>ED3280</td>
+                            <td>Tâm lý học ứng dụng</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="semester">
+                <h3>Học Kỳ 2024.2 (20242)</h3>
+                <table id="table-20242">
+                    <thead>
+                        <tr>
+                            <th>Mã HP</th>
+                            <th>Tên Học Phần</th>
+                            <th>Tín Chỉ</th>
+                            <th>Điểm Số</th>
+                            <th>Điểm Chữ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4611</td>
+                            <td>Các hệ thống phân tán và ứng dụng</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="B" data-score="3.0">
+                            <td>IT4060</td>
+                            <td>Lập trình mạng</td>
+                            <td>2</td>
+                            <td>3.0</td>
+                            <td>B</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT4015</td>
+                            <td>Nhập môn an toàn thông tin</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                        <tr data-grade="A+" data-score="4.0">
+                            <td>IT3931</td>
+                            <td>Project II</td>
+                            <td>2</td>
+                            <td>4.0</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr data-grade="C+" data-score="2.5">
+                            <td>IT3180</td>
+                            <td>Nhập môn công nghệ phần mềm</td>
+                            <td>3</td>
+                            <td>2.5</td>
+                            <td>C+</td>
+                        </tr>
+                        <tr data-grade="D" data-score="1.0">
+                            <td>IT3170</td>
+                            <td>Thuật toán ứng dụng</td>
+                            <td>2</td>
+                            <td>1.0</td>
+                            <td>D</td>
+                        </tr>
+                        <tr data-grade="B+" data-score="3.3">
+                            <td>IT3120</td>
+                            <td>Phân tích và thiết kế hệ thống</td>
+                            <td>2</td>
+                            <td>3.3</td>
+                            <td>B+</td>
+                        </tr>
+                        <tr data-grade="A" data-score="4.0">
+                            <td>IT3070</td>
+                            <td>Nguyên lý hệ điều hành</td>
+                            <td>3</td>
+                            <td>4.0</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="gpa-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Lưu trữ dữ liệu gốc
+        let originalData20241 = [];
+        let originalData20242 = [];
+
+        // Khởi tạo dữ liệu gốc khi tải trang
+        window.onload = function() {
+            saveOriginalData();
+        };
+
+        function saveOriginalData() {
+            const table1 = document.querySelector('#table-20241 tbody');
+            const table2 = document.querySelector('#table-20242 tbody');
+            
+            originalData20241 = Array.from(table1.rows).map(row => row.cloneNode(true));
+            originalData20242 = Array.from(table2.rows).map(row => row.cloneNode(true));
+        }
+
+        // Hàm highlight điểm A, A+ (xanh) và F (đen)
+        function highlightGrades() {
+            const tables = document.querySelectorAll('table tbody tr');
+            tables.forEach(row => {
+                const grade = row.getAttribute('data-grade');
+                
+                // Xóa các class highlight cũ
+                row.classList.remove('highlight-a', 'highlight-f');
+                
+                // Tô màu xanh cho A và A+
+                if (grade === 'A' || grade === 'A+') {
+                    row.classList.add('highlight-a');
+                }
+                // Tô màu đen cho F
+                else if (grade === 'F') {
+                    row.classList.add('highlight-f');
+                }
+            });
+        }
+
+        // Hàm tính GPA
+        function calculateGPA() {
+            const gpaResult = document.getElementById('gpa-result');
+            
+            // Tính GPA cho học kỳ 20241
+            const gpa20241 = calculateSemesterGPA('table-20241');
+            
+            // Tính GPA cho học kỳ 20242
+            const gpa20242 = calculateSemesterGPA('table-20242');
+            
+            // Hiển thị kết quả
+            gpaResult.innerHTML = `
+                <div class="gpa-display">
+                    <h3>Kết Quả Điểm Trung Bình (GPA)</h3>
+                    <div class="gpa-item">
+                        <strong>Học kỳ 2024.1:</strong> ${gpa20241.toFixed(2)} / 4.0
+                    </div>
+                    <div class="gpa-item">
+                        <strong>Học kỳ 2024.2:</strong> ${gpa20242.toFixed(2)} / 4.0
+                    </div>
+                    <div class="gpa-item">
+                        <strong>Trung bình cả 2 học kỳ:</strong> ${((gpa20241 + gpa20242) / 2).toFixed(2)} / 4.0
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateSemesterGPA(tableId) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            const rows = tbody.querySelectorAll('tr:not(.hidden)');
+            
+            let totalScore = 0;
+            let totalCredits = 0;
+            
+            rows.forEach(row => {
+                const credits = parseFloat(row.cells[2].textContent);
+                const score = parseFloat(row.getAttribute('data-score'));
+                const grade = row.getAttribute('data-grade');
+                
+                // Chỉ tính các môn có tín chỉ > 0 và không phải R (điểm R không tính vào GPA)
+                if (credits > 0 && grade !== 'R') {
+                    totalScore += score * credits;
+                    totalCredits += credits;
+                }
+            });
+            
+            return totalCredits > 0 ? totalScore / totalCredits : 0;
+        }
+
+        // Hàm filter chỉ giữ lại A và A+
+        function filterTopGrades() {
+            const tables = document.querySelectorAll('table tbody tr');
+            
+            tables.forEach(row => {
+                const grade = row.getAttribute('data-grade');
+                
+                if (grade === 'A' || grade === 'A+') {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Hàm sắp xếp theo điểm số (cao -> thấp). Nếu điểm bằng nhau, dùng thứ tự grade để A+ > A
+        function sortByGrade() {
+            sortTable('table-20241');
+            sortTable('table-20242');
+        }
+
+        function sortTable(tableId) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Bản đồ thứ tự cho các grade để so sánh khi điểm bằng nhau
+            const gradeOrder = {
+                'A+': 12,
+                'A': 11,
+                'A-': 10,
+                'B+': 9,
+                'B': 8,
+                'B-': 7,
+                'C+': 6,
+                'C': 5,
+                'C-': 4,
+                'D+': 3,
+                'D': 2,
+                'D-': 1,
+                'F': 0,
+                'R': -1
+            };
+
+            // Sắp xếp theo điểm tăng dần (thấp -> cao). Nếu bằng điểm, dùng gradeOrder để A+ > A
+            // (trong thứ tự tăng dần về score thì A sẽ đứng trước A+ khi cùng score vì A+ được coi là "cao hơn").
+            rows.sort((a, b) => {
+                const scoreA = parseFloat(a.getAttribute('data-score'));
+                const scoreB = parseFloat(b.getAttribute('data-score'));
+
+                if (!isNaN(scoreA) && !isNaN(scoreB) && scoreA !== scoreB) {
+                    return scoreA - scoreB; // low to high
+                }
+
+                const gradeA = a.getAttribute('data-grade') || '';
+                const gradeB = b.getAttribute('data-grade') || '';
+                const rankA = gradeOrder.hasOwnProperty(gradeA) ? gradeOrder[gradeA] : 0;
+                const rankB = gradeOrder.hasOwnProperty(gradeB) ? gradeOrder[gradeB] : 0;
+
+                // Vì gradeOrder lớn hơn nghĩa là grade cao hơn (A+ > A). Khi score bằng nhau và ta muốn A+ đứng
+                // sau A trong thứ tự tăng dần (A trước A+), thì trả về rankA - rankB.
+                return rankA - rankB;
+            });
+
+            // Xóa tất cả các hàng hiện tại
+            tbody.innerHTML = '';
+
+            // Thêm lại các hàng đã sắp xếp
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Hàm reset về trạng thái ban đầu
+        function resetTable() {
+            // Reset bảng 20241
+            const tbody1 = document.querySelector('#table-20241 tbody');
+            tbody1.innerHTML = '';
+            originalData20241.forEach(row => {
+                const newRow = row.cloneNode(true);
+                newRow.classList.remove('highlight-a', 'highlight-f', 'hidden');
+                tbody1.appendChild(newRow);
+            });
+            
+            // Reset bảng 20242
+            const tbody2 = document.querySelector('#table-20242 tbody');
+            tbody2.innerHTML = '';
+            originalData20242.forEach(row => {
+                const newRow = row.cloneNode(true);
+                newRow.classList.remove('highlight-a', 'highlight-f', 'hidden');
+                tbody2.appendChild(newRow);
+            });
+            
+            // Xóa kết quả GPA
+            document.getElementById('gpa-result').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
