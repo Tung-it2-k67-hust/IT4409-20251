@@ -363,7 +363,7 @@ process.on('unhandledRejection', (err, promise) => {
 /*
 Thay thế trong file .env:
 
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/user_management?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/YOUR_DATABASE?retryWrites=true&w=majority
 PORT=5000
 NODE_ENV=development
 
