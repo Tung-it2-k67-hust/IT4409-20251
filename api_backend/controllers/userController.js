@@ -1,12 +1,9 @@
 const User = require('../models/userModel');
 
-// @desc    Get all users
-// @route   GET /api/users
-// @access  Public
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    
+
     res.status(200).json({
       success: true,
       count: users.length,
@@ -17,9 +14,6 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-// @desc    Get single user by ID
-// @route   GET /api/users/:id
-// @access  Public
 const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -36,7 +30,6 @@ const getUserById = async (req, res, next) => {
       data: user
     });
   } catch (error) {
-    // Handle invalid ObjectId format
     if (error.kind === 'ObjectId') {
       return res.status(404).json({
         success: false,
@@ -47,14 +40,10 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// @desc    Create new user
-// @route   POST /api/users
-// @access  Public
 const createUser = async (req, res, next) => {
   try {
     const { name, email, age, role } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -76,7 +65,6 @@ const createUser = async (req, res, next) => {
       data: user
     });
   } catch (error) {
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -89,14 +77,10 @@ const createUser = async (req, res, next) => {
   }
 };
 
-// @desc    Update user
-// @route   PUT /api/users/:id
-// @access  Public
 const updateUser = async (req, res, next) => {
   try {
     const { name, email, age, role, isActive } = req.body;
 
-    // Check if user exists
     let user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({
@@ -105,7 +89,6 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-    // If email is being updated, check for duplicates
     if (email && email !== user.email) {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
@@ -116,13 +99,12 @@ const updateUser = async (req, res, next) => {
       }
     }
 
-    // Update user
     user = await User.findByIdAndUpdate(
       req.params.id,
       { name, email, age, role, isActive },
       {
-        new: true, // Return updated document
-        runValidators: true // Run model validators
+        new: true,
+        runValidators: true
       }
     );
 
@@ -132,7 +114,6 @@ const updateUser = async (req, res, next) => {
       data: user
     });
   } catch (error) {
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -141,7 +122,6 @@ const updateUser = async (req, res, next) => {
         errors: messages
       });
     }
-    // Handle invalid ObjectId format
     if (error.kind === 'ObjectId') {
       return res.status(404).json({
         success: false,
@@ -152,9 +132,6 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
-// @access  Public
 const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -174,7 +151,6 @@ const deleteUser = async (req, res, next) => {
       data: {}
     });
   } catch (error) {
-    // Handle invalid ObjectId format
     if (error.kind === 'ObjectId') {
       return res.status(404).json({
         success: false,

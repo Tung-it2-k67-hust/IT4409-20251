@@ -34,11 +34,8 @@ const userSchema = new mongoose.Schema({
     default: true
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt fields
+  timestamps: true
 });
-
-// Index for better query performance
-// userSchema.index({ email: 1 }); // Removed duplicate index (unique: true already creates one)
 
 const User = mongoose.model('User', userSchema);
 

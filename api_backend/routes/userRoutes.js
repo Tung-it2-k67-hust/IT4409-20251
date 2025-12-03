@@ -8,14 +8,13 @@ const {
   deleteUser
 } = require('../controllers/userController');
 
-// Routes
 router.route('/')
-  .get(getAllUsers)      // GET /api/users
-  .post(createUser);     // POST /api/users
+  .get(getAllUsers)
+  .post(createUser);
 
 router.route('/:id')
-  .get(getUserById)      // GET /api/users/:id
-  .put(updateUser)       // PUT /api/users/:id
-  .delete(deleteUser);   // DELETE /api/users/:id
+  .get(getUserById)
+  .put(updateUser)
+  .delete(deleteUser);
 
 module.exports = router;

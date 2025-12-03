@@ -8,11 +8,10 @@ const connectDB = async () => {
     console.log(`Database: ${conn.connection.name}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    process.exit(1); // Exit with failure
+    process.exit(1);
   }
 };
 
-// Handle connection events
 mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected');
 });
